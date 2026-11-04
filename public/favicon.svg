@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e1017" />
+      <stop offset="100%" stop-color="#040507" />
+    </linearGradient>
+
+    <!-- Border Gradient -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4ade80" stop-opacity="0.45" />
+      <stop offset="40%" stop-color="#22d3ee" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.06" />
+    </linearGradient>
+
+    <!-- Top Glow -->
+    <radialGradient id="innerGlow" cx="50%" cy="15%" r="65%">
+      <stop offset="0%" stop-color="#22c55e" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Terminal Prompt Gradient -->
+    <linearGradient id="promptGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4ade80" />
+      <stop offset="100%" stop-color="#16a34a" />
+    </linearGradient>
+
+    <!-- Terminal Cursor Gradient -->
+    <linearGradient id="cursorGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Squircle Card -->
+  <rect x="1" y="1" width="30" height="30" rx="7.5" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="1.2" />
+  <rect x="1.6" y="1.6" width="28.8" height="28.8" rx="6.9" fill="url(#innerGlow)" />
+
+  <!-- Terminal Prompt ❯ -->
+  <path d="M 8.5 10.5 L 14.5 16 L 8.5 21.5" fill="none" stroke="url(#promptGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Terminal Cursor _ -->
+  <line x1="18" y1="21.5" x2="24" y2="21.5" stroke="url(#cursorGrad)" stroke-width="3" stroke-linecap="round" />
+</svg>
