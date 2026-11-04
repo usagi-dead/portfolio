@@ -41,8 +41,8 @@ export function Footer({ lang, onShowToast }: FooterProps) {
           <AnimatedLink
             href={
               lang === 'ru'
-                ? '/Alexander_Luchinovich_CV_RU.pdf'
-                : '/Alexander_Luchinovich_CV_EN.pdf'
+                ? './Alexander_Luchinovich_CV_RU.pdf'
+                : './Alexander_Luchinovich_CV_EN.pdf'
             }
             label={lang === 'ru' ? 'Резюме' : 'Resume'}
             download

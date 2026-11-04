@@ -13,12 +13,12 @@ export const PROJECTS: ProjectItem[] = [
       ru: 'Июнь 2026 – Н.в.',
     },
     stack: ['Angular', 'TypeScript', 'RxJS', 'Signals', 'Tailwind CSS', 'Figma'],
-    image: '/projects/car-auction.webp',
+    image: './projects/car-auction.webp',
     accentColor: '#00BC7D',
     accentRgb: '0, 188, 125',
     screens: [
       {
-        src: '/projects/car-auction.webp',
+        src: './projects/car-auction.webp',
         title: {
           en: 'Screen 01 · Live Auction Marketplace',
           ru: 'Экран 01 · Витрина активных аукционов',
@@ -29,7 +29,7 @@ export const PROJECTS: ProjectItem[] = [
         },
       },
       {
-        src: '/projects/car-auction-2.webp',
+        src: './projects/car-auction-2.webp',
         title: {
           en: 'Screen 02 · Vehicle Inspection & Bidding Terminal',
           ru: 'Экран 02 · Инспекция автомобиля и терминал ставок',
@@ -40,7 +40,7 @@ export const PROJECTS: ProjectItem[] = [
         },
       },
       {
-        src: '/projects/car-auction-3.webp',
+        src: './projects/car-auction-3.webp',
         title: {
           en: 'Screen 03 · Bidder Dashboard & Lot Tracking',
           ru: 'Экран 03 · Личный кабинет и трекер ставок',
@@ -68,13 +68,13 @@ export const PROJECTS: ProjectItem[] = [
       ru: 'Июнь 2025',
     },
     stack: ['React', 'TypeScript', 'Redux', 'Chakra UI'],
-    image: '/projects/shavabear-1.webp',
+    image: './projects/shavabear-1.webp',
     layout: 'mobile-trio',
     accentColor: '#6ED209',
     accentRgb: '110, 210, 9',
     screens: [
       {
-        src: '/projects/shavabear-1.webp',
+        src: './projects/shavabear-1.webp',
         title: {
           en: 'Screen 01 · Dynamic Menu, Promo Stories & Categories',
           ru: 'Экран 01 · Динамическое меню, сторис и категории блюд',
@@ -85,7 +85,7 @@ export const PROJECTS: ProjectItem[] = [
         },
       },
       {
-        src: '/projects/shavabear-2.webp',
+        src: './projects/shavabear-2.webp',
         title: {
           en: 'Screen 02 · Item Customizer & Ingredient Management',
           ru: 'Экран 02 · Карточка блюда и кастомизация ингредиентов',
@@ -96,7 +96,7 @@ export const PROJECTS: ProjectItem[] = [
         },
       },
       {
-        src: '/projects/shavabear-3.webp',
+        src: './projects/shavabear-3.webp',
         title: {
           en: 'Screen 03 · Shopping Cart & Fast Checkout',
           ru: 'Экран 03 · Корзина и оформление заказа',
@@ -125,12 +125,12 @@ export const PROJECTS: ProjectItem[] = [
       ru: 'Май 2024',
     },
     stack: ['React', 'TypeScript', 'REST API', 'SCSS'],
-    image: '/projects/offliner.webp',
+    image: './projects/offliner.webp',
     accentColor: '#025ADD',
     accentRgb: '2, 90, 221',
     screens: [
       {
-        src: '/projects/offliner.webp',
+        src: './projects/offliner.webp',
         title: {
           en: 'Screen 01 · Home Feed & Hot Deals',
           ru: 'Экран 01 · Главная страница и акционные предложения',
@@ -141,7 +141,7 @@ export const PROJECTS: ProjectItem[] = [
         },
       },
       {
-        src: '/projects/offliner-2.webp',
+        src: './projects/offliner-2.webp',
         title: {
           en: 'Screen 02 · Hardware Catalog with Parametric Filters',
           ru: 'Экран 02 · Каталог видеокарт с многоуровневыми фильтрами',
@@ -152,7 +152,7 @@ export const PROJECTS: ProjectItem[] = [
         },
       },
       {
-        src: '/projects/offliner-3.webp',
+        src: './projects/offliner-3.webp',
         title: {
           en: 'Screen 03 · Instant Live Search Modal',
           ru: 'Экран 03 · Быстрый предиктивный поиск',

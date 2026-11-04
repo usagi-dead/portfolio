@@ -20,8 +20,8 @@ export function Header({
   const isScrolled = useScrollScrolled(16);
   const resumeUrl =
     lang === 'ru'
-      ? '/Alexander_Luchinovich_CV_RU.pdf'
-      : '/Alexander_Luchinovich_CV_EN.pdf';
+      ? './Alexander_Luchinovich_CV_RU.pdf'
+      : './Alexander_Luchinovich_CV_EN.pdf';
 
   return (
     <header
