@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { Lang, ProjectScreen } from '../../types/portfolio';
 
 interface ProjectImageProps {
@@ -52,6 +52,42 @@ export function ProjectImage({
 }: ProjectImageProps) {
   const hasMultiple = (screens?.length ?? 0) > 1;
   const activeScreen = screens?.[currentScreenIdx];
+
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+  const isSwipingRef = useRef(false);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!hasMultiple) return;
+    touchStartXRef.current = e.touches[0].clientX;
+    touchStartYRef.current = e.touches[0].clientY;
+    isSwipingRef.current = false;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!hasMultiple || touchStartXRef.current === null || touchStartYRef.current === null) return;
+    const diffX = Math.abs(e.touches[0].clientX - touchStartXRef.current);
+    const diffY = Math.abs(e.touches[0].clientY - touchStartYRef.current);
+    if (diffX > 10 && diffX > diffY) {
+      isSwipingRef.current = true;
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!hasMultiple || touchStartXRef.current === null || touchStartYRef.current === null) return;
+    const diffX = touchStartXRef.current - e.changedTouches[0].clientX;
+    const diffY = touchStartYRef.current - e.changedTouches[0].clientY;
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+
+    if (Math.abs(diffX) > 40 && Math.abs(diffX) > Math.abs(diffY)) {
+      if (diffX > 0) {
+        onNextScreen?.(e as unknown as React.MouseEvent);
+      } else {
+        onPrevScreen?.(e as unknown as React.MouseEvent);
+      }
+    }
+  };
 
   // Preload all project screen images into browser memory on mount
   useEffect(() => {
@@ -130,8 +166,17 @@ export function ProjectImage({
 
       {/* --- Fixed Aspect Ratio Viewport (16:9 exact ratio matching 1200x675 screenshots) --- */}
       <div
-        onClick={onClick}
-        className="relative aspect-[16/9] w-full overflow-hidden cursor-zoom-in group/thumb bg-black/40"
+        onClick={() => {
+          if (isSwipingRef.current) {
+            isSwipingRef.current = false;
+            return;
+          }
+          onClick?.();
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className="relative aspect-[16/9] w-full overflow-hidden cursor-zoom-in group/thumb bg-black/40 touch-pan-y"
       >
         <div className="grid grid-cols-1 grid-rows-1 w-full h-full">
           {screens && screens.length > 0 ? (

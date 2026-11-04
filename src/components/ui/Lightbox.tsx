@@ -499,10 +499,12 @@ export function Lightbox({
               return (
                 <div
                   key={screen.src}
-                  className={`w-full h-full shrink-0 flex flex-col items-center justify-center px-2 sm:px-6 select-none transition-opacity duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                  className={`w-full h-full shrink-0 flex flex-col items-center justify-center px-2 sm:px-6 select-none transition-opacity duration-300 ${
                     isZoomed ? 'overflow-visible' : ''
                   } ${
-                    isActive ? 'opacity-100' : 'opacity-30 pointer-events-none'
+                    isActive
+                      ? 'opacity-100 z-10'
+                      : 'opacity-0 invisible pointer-events-none'
                   }`}
                   onClick={(e) => {
                     if (e.target === e.currentTarget) {
@@ -515,6 +517,8 @@ export function Lightbox({
                     onClick={(e) => e.stopPropagation()}
                     className={`relative max-w-full max-h-full flex flex-col items-center justify-center cursor-default ${
                       isZoomed ? 'overflow-visible' : ''
+                    } ${
+                      isActive ? '' : 'invisible pointer-events-none'
                     }`}
                   >
                     <img
@@ -534,7 +538,7 @@ export function Lightbox({
                               ? 'cursor-grabbing'
                               : 'cursor-grab'
                             : 'cursor-zoom-in'
-                          : ''
+                          : 'invisible opacity-0 pointer-events-none'
                       }`}
                       style={
                         isActive && isZoomed

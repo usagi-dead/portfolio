@@ -1,5 +1,5 @@
 import { Maximize2 } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Lang, ProjectScreen } from '../../types/portfolio';
 
 interface MobileTrioShowcaseProps {
@@ -13,7 +13,7 @@ interface MobileTrioShowcaseProps {
 
 const FLOW_TITLES: Record<Lang, { default: string; screens: [string, string, string] }> = {
   en: {
-    default: 'Telegram Mini App · 01 Menu · 02 Builder · 03 Cart',
+    default: 'Telegram Mini App · 01 Menu · 02 Dish · 03 Cart',
     screens: [
       'Screen 01 · Dynamic Menu, Promo Stories & Categories',
       'Screen 02 · Item Customizer & Ingredient Management',
@@ -21,7 +21,7 @@ const FLOW_TITLES: Record<Lang, { default: string; screens: [string, string, str
     ],
   },
   ru: {
-    default: 'Telegram Mini App · 01 Меню · 02 Конструктор · 03 Корзина',
+    default: 'Telegram Mini App · 01 Меню · 02 Блюдо · 03 Корзина',
     screens: [
       'Экран 01 · Динамическое меню, сторис и категории блюд',
       'Экран 02 · Карточка блюда и кастомизация ингредиентов',
@@ -104,15 +104,23 @@ export function MobileTrioShowcase({
   accentRgb = '110, 210, 9',
 }: MobileTrioShowcaseProps) {
   const [focusedScreen, setFocusedScreen] = useState<number | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isProgrammaticScrollRef = useRef(false);
 
   const handleHoverScreen = (idx: number) => {
     setFocusedScreen(idx);
   };
 
   const handleSelectScreen = (idx: number) => {
+    // If tapping the already focused screen, toggle it off
+    if (focusedScreen === idx) {
+      setFocusedScreen(null);
+      return;
+    }
     setFocusedScreen(idx);
     if (scrollContainerRef.current) {
+      isProgrammaticScrollRef.current = true;
       const target = scrollContainerRef.current.querySelector(
         `[data-screen-idx="${idx}"]`
       ) as HTMLElement | null;
@@ -123,13 +131,39 @@ export function MobileTrioShowcase({
           block: 'nearest',
         });
       }
+      setTimeout(() => {
+        isProgrammaticScrollRef.current = false;
+      }, 500);
     }
   };
+
+  // Reset focus when user scrolls the page
+  useEffect(() => {
+    if (focusedScreen === null) return;
+    const handleWindowScroll = () => {
+      setFocusedScreen(null);
+    };
+    window.addEventListener('scroll', handleWindowScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleWindowScroll);
+  }, [focusedScreen]);
+
+  // Reset focus on click / tap outside of the showcase
+  useEffect(() => {
+    if (focusedScreen === null) return;
+    const handlePointerDown = (e: PointerEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+        setFocusedScreen(null);
+      }
+    };
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [focusedScreen]);
 
   const isAnyFocused = focusedScreen !== null;
 
   return (
     <div
+      ref={rootRef}
       onMouseLeave={() => setFocusedScreen(null)}
       className="relative group/img rounded-2xl bg-[#09090b] border border-white/[0.08] overflow-hidden select-none"
     >
@@ -209,6 +243,14 @@ export function MobileTrioShowcase({
       <div className="p-3 sm:p-6 md:p-8 relative">
         <div
           ref={scrollContainerRef}
+          onTouchMove={() => {
+            if (focusedScreen !== null) setFocusedScreen(null);
+          }}
+          onScroll={() => {
+            if (!isProgrammaticScrollRef.current && focusedScreen !== null) {
+              setFocusedScreen(null);
+            }
+          }}
           className="relative z-10 flex sm:grid sm:grid-cols-3 sm:gap-5 md:gap-6 items-center overflow-x-auto sm:overflow-visible snap-x snap-mandatory gap-3.5 px-3 sm:px-1 pt-2 sm:pt-4 pb-3 sm:pb-4 custom-scrollbar"
         >
           {screens.map((screen, idx) => {

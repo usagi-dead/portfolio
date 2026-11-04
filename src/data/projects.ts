@@ -52,7 +52,7 @@ export const PROJECTS: ProjectItem[] = [
       },
     ],
     links: [
-      { label: 'Figma', url: 'https://www.behance.net/usagi-dead' },
+      { label: 'Design', url: 'https://www.behance.net/usagi-dead' },
       { label: 'GitHub', url: 'https://github.com/uselessBit/auction-platform' },
     ],
   },
@@ -109,7 +109,7 @@ export const PROJECTS: ProjectItem[] = [
     ],
     links: [
       { label: 'Bot', url: 'https://t.me/shavabearbot' },
-      { label: 'Figma', url: 'https://www.behance.net/usagi-dead' },
+      { label: 'Design', url: 'https://www.behance.net/usagi-dead' },
       { label: 'GitHub', url: 'https://github.com/uselessBit/shawa-bear-tg-mini-app' },
     ],
   },
@@ -164,6 +164,7 @@ export const PROJECTS: ProjectItem[] = [
       },
     ],
     links: [
+      { label: 'Design', url: 'https://www.behance.net/usagi-dead' },
       { label: 'GitHub', url: 'https://github.com/usagi-dead/offliner' },
     ],
   },
