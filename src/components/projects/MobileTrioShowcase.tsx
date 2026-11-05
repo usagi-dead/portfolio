@@ -165,19 +165,19 @@ export function MobileTrioShowcase({
     <div
       ref={rootRef}
       onMouseLeave={() => setFocusedScreen(null)}
-      className="relative group/img rounded-2xl bg-[#09090b] border border-white/[0.08] overflow-hidden select-none"
+      className="relative group/img rounded-2xl bg-[#09090b] border border-white/[0.08] overflow-hidden select-none isolate"
     >
       {/* Top accent border line matching card styling */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-20 top-0 h-[1px] z-20"
+        className="pointer-events-none absolute inset-x-6 sm:inset-x-20 top-0 h-[1px] z-20"
         style={{
           background: `linear-gradient(to right, transparent, rgba(${accentRgb}, 0.4), transparent)`,
         }}
       />
 
       {/* --- Top Sub-bar / Interactive User Flow Bar (Car Auction matching geometry and height) --- */}
-      <div className="relative z-10 flex items-center justify-between min-h-[58px] sm:min-h-[62px] p-2.5 sm:p-3 border-b border-white/[0.06] bg-white/[0.015] backdrop-blur-sm text-xs font-mono">
+      <div className="relative z-10 flex items-center justify-between min-h-[58px] sm:min-h-[62px] p-2.5 sm:p-3 border-b border-white/[0.06] bg-white/[0.015] backdrop-blur-sm text-xs font-mono rounded-t-[15px]">
         <div className="text-zinc-400 truncate pr-2 flex items-center gap-2 min-w-0">
           <span
             className="w-1.5 h-1.5 rounded-full shrink-0"
@@ -240,7 +240,7 @@ export function MobileTrioShowcase({
       </div>
 
       {/* --- 3 Smartphones on Dark Podium (Desktop: 3 in a row / Mobile: compact horizontal swipe carousel) --- */}
-      <div className="p-3 sm:p-6 md:p-8 relative">
+      <div className="p-3 sm:p-6 md:p-8 relative rounded-b-[15px]">
         <div
           ref={scrollContainerRef}
           onTouchMove={() => {

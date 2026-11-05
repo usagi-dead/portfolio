@@ -100,11 +100,11 @@ export function ProjectImage({
   }, [screens]);
 
   return (
-    <div className="relative group/img rounded-2xl bg-[#09090b] border border-white/[0.08] overflow-hidden select-none">
+    <div className="relative group/img rounded-2xl bg-[#09090b] border border-white/[0.08] overflow-hidden select-none isolate">
       {/* Top accent border line matching card styling */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-20 top-0 h-[1px] z-20"
+        className="pointer-events-none absolute inset-x-6 sm:inset-x-20 top-0 h-[1px] z-20"
         style={{
           background: `linear-gradient(to right, transparent, rgba(${accentRgb}, 0.4), transparent)`,
         }}
@@ -112,7 +112,7 @@ export function ProjectImage({
 
       {/* --- Top Sub-bar with screen tabs (if multiple screens) --- */}
       {hasMultiple && (
-        <div className="relative z-10 flex items-center justify-between min-h-[58px] sm:min-h-[62px] p-2.5 sm:p-3 border-b border-white/[0.06] bg-white/[0.015] backdrop-blur-sm text-xs font-mono">
+        <div className="relative z-10 flex items-center justify-between min-h-[58px] sm:min-h-[62px] p-2.5 sm:p-3 border-b border-white/[0.06] bg-white/[0.015] backdrop-blur-sm text-xs font-mono rounded-t-[15px]">
           <div className="text-zinc-400 truncate pr-2 flex items-center gap-2">
             <span
               className="w-1.5 h-1.5 rounded-full shrink-0"
@@ -176,7 +176,7 @@ export function ProjectImage({
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className="relative aspect-[16/9] w-full overflow-hidden cursor-zoom-in group/thumb bg-black/40 touch-pan-y"
+        className="relative aspect-[16/9] w-full overflow-hidden cursor-zoom-in group/thumb bg-black/40 touch-pan-y rounded-b-[15px]"
       >
         <div className="grid grid-cols-1 grid-rows-1 w-full h-full">
           {screens && screens.length > 0 ? (
