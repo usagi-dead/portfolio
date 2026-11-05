@@ -68,7 +68,7 @@ export function ProjectImage({
     if (!hasMultiple || touchStartXRef.current === null || touchStartYRef.current === null) return;
     const diffX = Math.abs(e.touches[0].clientX - touchStartXRef.current);
     const diffY = Math.abs(e.touches[0].clientY - touchStartYRef.current);
-    if (diffX > 10 && diffX > diffY) {
+    if (diffX > 8 && diffX > diffY) {
       isSwipingRef.current = true;
     }
   };
@@ -80,7 +80,7 @@ export function ProjectImage({
     touchStartXRef.current = null;
     touchStartYRef.current = null;
 
-    if (Math.abs(diffX) > 40 && Math.abs(diffX) > Math.abs(diffY)) {
+    if (Math.abs(diffX) > 35 && Math.abs(diffX) > Math.abs(diffY)) {
       if (diffX > 0) {
         onNextScreen?.(e as unknown as React.MouseEvent);
       } else {
@@ -178,30 +178,30 @@ export function ProjectImage({
         onTouchEnd={handleTouchEnd}
         className="relative aspect-[16/9] w-full overflow-hidden cursor-zoom-in group/thumb bg-black/40 touch-pan-y rounded-b-[15px]"
       >
-        <div className="grid grid-cols-1 grid-rows-1 w-full h-full">
+        {/* Horizontal sliding track for animated screen flipping */}
+        <div
+          className="flex w-full h-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform"
+          style={{ transform: `translateX(-${currentScreenIdx * 100}%)` }}
+        >
           {screens && screens.length > 0 ? (
-            screens.map((screen, idx) => (
+            screens.map((screen) => (
               <div
                 key={screen.src}
-                className={`col-start-1 row-start-1 w-full h-full transition-all duration-500 ease-out flex items-start justify-center ${
-                  idx === currentScreenIdx
-                    ? 'opacity-100 scale-100 z-10 pointer-events-auto'
-                    : 'opacity-0 scale-[0.985] z-0 pointer-events-none'
-                }`}
+                className="w-full h-full shrink-0 flex items-start justify-center"
               >
                 <FallbackImage
                   src={screen.src}
                   alt={screen.title?.[lang] || alt}
-                  className="w-full h-full object-cover object-top rounded-b-xl"
+                  className="w-full h-full object-cover object-top select-none pointer-events-none"
                 />
               </div>
             ))
           ) : (
-            <div className="col-start-1 row-start-1 w-full h-full flex items-start justify-center">
+            <div className="w-full h-full shrink-0 flex items-start justify-center">
               <FallbackImage
                 src={src}
                 alt={alt}
-                className="w-full h-full object-cover object-top rounded-b-xl"
+                className="w-full h-full object-cover object-top select-none pointer-events-none"
               />
             </div>
           )}

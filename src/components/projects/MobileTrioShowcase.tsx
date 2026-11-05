@@ -1,5 +1,5 @@
 import { Maximize2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import type { Lang, ProjectScreen } from '../../types/portfolio';
 
 interface MobileTrioShowcaseProps {
@@ -103,68 +103,129 @@ export function MobileTrioShowcase({
   accentColor = '#6ED209',
   accentRgb = '110, 210, 9',
 }: MobileTrioShowcaseProps) {
-  const [focusedScreen, setFocusedScreen] = useState<number | null>(null);
+  const [activeMobileIdx, setActiveMobileIdx] = useState(0);
+  const [hoveredScreen, setHoveredScreen] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 640;
+    }
+    return false;
+  });
+
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isProgrammaticScrollRef = useRef(false);
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+  const isSwipingRef = useRef(false);
 
-  const handleHoverScreen = (idx: number) => {
-    setFocusedScreen(idx);
-  };
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    window.addEventListener('resize', handleResize, { passive: true });
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-  const handleSelectScreen = (idx: number) => {
-    // If tapping the already focused screen, toggle it off
-    if (focusedScreen === idx) {
-      setFocusedScreen(null);
-      return;
-    }
-    setFocusedScreen(idx);
-    if (scrollContainerRef.current) {
+  const scrollToScreen = useCallback((idx: number) => {
+    setActiveMobileIdx(idx);
+    const container = scrollContainerRef.current;
+    if (container && window.innerWidth < 640) {
       isProgrammaticScrollRef.current = true;
-      const target = scrollContainerRef.current.querySelector(
+      const target = container.querySelector(
         `[data-screen-idx="${idx}"]`
       ) as HTMLElement | null;
       if (target) {
-        target.scrollIntoView({
+        const targetCenter = target.offsetLeft + target.offsetWidth / 2;
+        const scrollLeft = targetCenter - container.clientWidth / 2;
+        container.scrollTo({
+          left: scrollLeft,
           behavior: 'smooth',
-          inline: 'center',
-          block: 'nearest',
         });
       }
       setTimeout(() => {
         isProgrammaticScrollRef.current = false;
-      }, 500);
+      }, 450);
+    }
+  }, []);
+
+  // Sync active indicator while user scrolls horizontally on mobile
+  const handleScroll = useCallback(() => {
+    if (isProgrammaticScrollRef.current) return;
+    const container = scrollContainerRef.current;
+    if (!container || window.innerWidth >= 640) return;
+
+    const containerCenter = container.scrollLeft + container.clientWidth / 2;
+    const children = Array.from(container.children) as HTMLElement[];
+
+    let closestIdx = 0;
+    let minDistance = Infinity;
+
+    children.forEach((child, idx) => {
+      const childCenter = child.offsetLeft + child.offsetWidth / 2;
+      const dist = Math.abs(containerCenter - childCenter);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestIdx = idx;
+      }
+    });
+
+    if (activeMobileIdx !== closestIdx) {
+      setActiveMobileIdx(closestIdx);
+    }
+  }, [activeMobileIdx]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+    touchStartYRef.current = e.touches[0].clientY;
+    isSwipingRef.current = false;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
+    const diffX = Math.abs(e.touches[0].clientX - touchStartXRef.current);
+    const diffY = Math.abs(e.touches[0].clientY - touchStartYRef.current);
+    if (diffX > 8 && diffX > diffY) {
+      isSwipingRef.current = true;
     }
   };
 
-  // Reset focus when user scrolls the page
-  useEffect(() => {
-    if (focusedScreen === null) return;
-    const handleWindowScroll = () => {
-      setFocusedScreen(null);
-    };
-    window.addEventListener('scroll', handleWindowScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleWindowScroll);
-  }, [focusedScreen]);
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
+    const diffX = touchStartXRef.current - e.changedTouches[0].clientX;
+    const diffY = touchStartYRef.current - e.changedTouches[0].clientY;
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
 
-  // Reset focus on click / tap outside of the showcase
-  useEffect(() => {
-    if (focusedScreen === null) return;
-    const handlePointerDown = (e: PointerEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
-        setFocusedScreen(null);
+    if (Math.abs(diffX) > 35 && Math.abs(diffX) > Math.abs(diffY)) {
+      if (diffX > 0 && activeMobileIdx < screens.length - 1) {
+        scrollToScreen(activeMobileIdx + 1);
+      } else if (diffX < 0 && activeMobileIdx > 0) {
+        scrollToScreen(activeMobileIdx - 1);
       }
-    };
-    document.addEventListener('pointerdown', handlePointerDown);
-    return () => document.removeEventListener('pointerdown', handlePointerDown);
-  }, [focusedScreen]);
+    }
+  };
 
-  const isAnyFocused = focusedScreen !== null;
+  const handleSelectScreen = (idx: number) => {
+    if (isMobile) {
+      scrollToScreen(idx);
+    } else {
+      if (hoveredScreen === idx) {
+        setHoveredScreen(null);
+      } else {
+        setHoveredScreen(idx);
+      }
+    }
+  };
+
+  const currentDisplayIdx = isMobile ? activeMobileIdx : hoveredScreen;
 
   return (
     <div
       ref={rootRef}
-      onMouseLeave={() => setFocusedScreen(null)}
+      onMouseLeave={() => {
+        if (!isMobile) setHoveredScreen(null);
+      }}
       className="relative group/img rounded-2xl bg-[#09090b] border border-white/[0.08] overflow-hidden select-none isolate"
     >
       {/* Top accent border line matching card styling */}
@@ -187,27 +248,29 @@ export function MobileTrioShowcase({
             }}
           />
           <span
-            key={focusedScreen ?? 'default'}
+            key={currentDisplayIdx ?? 'default'}
             className="inline-block animate-text-swap text-zinc-300 font-medium truncate"
           >
-            {focusedScreen === null
+            {currentDisplayIdx === null
               ? FLOW_TITLES[lang].default
-              : FLOW_TITLES[lang].screens[focusedScreen]}
+              : FLOW_TITLES[lang].screens[currentDisplayIdx]}
           </span>
         </div>
 
         {/* Right side: compact 01 | 02 | 03 switcher with lime accent */}
         <div
-          onMouseLeave={() => setFocusedScreen(null)}
+          onMouseLeave={() => {
+            if (!isMobile) setHoveredScreen(null);
+          }}
           className="relative inline-flex items-center p-1 gap-1 rounded-xl bg-black/60 border border-white/[0.08] backdrop-blur-md shrink-0 nav-btn-group"
         >
           {/* Smooth sliding active indicator */}
           <div
             className={`pointer-events-none absolute top-1 bottom-1 left-1 w-6 sm:w-7 rounded-lg shadow-sm transition-all duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              focusedScreen !== null ? 'opacity-100' : 'opacity-0'
+              currentDisplayIdx !== null ? 'opacity-100' : 'opacity-0'
             }`}
             style={{
-              transform: `translateX(calc(${(focusedScreen ?? 0)} * var(--btn-step)))`,
+              transform: `translateX(calc(${(currentDisplayIdx ?? 0)} * var(--btn-step)))`,
               backgroundColor: `rgba(${accentRgb}, 0.2)`,
               borderColor: `rgba(${accentRgb}, 0.4)`,
               borderWidth: '1px',
@@ -218,18 +281,20 @@ export function MobileTrioShowcase({
             <button
               key={idx}
               type="button"
-              onMouseEnter={() => handleHoverScreen(idx)}
+              onMouseEnter={() => {
+                if (!isMobile) setHoveredScreen(idx);
+              }}
               onClick={(e) => {
                 e.stopPropagation();
                 handleSelectScreen(idx);
               }}
               className={`relative z-10 inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 p-0 rounded-lg font-mono text-[11px] sm:text-xs leading-none transition-colors duration-200 cursor-pointer before:absolute before:-inset-x-[2px] before:inset-y-0 before:content-[''] ${
-                focusedScreen === idx
+                currentDisplayIdx === idx
                   ? 'font-semibold'
                   : 'text-zinc-400 hover:text-zinc-200'
               }`}
               style={{
-                color: focusedScreen === idx ? accentColor : undefined,
+                color: currentDisplayIdx === idx ? accentColor : undefined,
               }}
               title={FLOW_TITLES[lang].screens[idx]}
             >
@@ -239,22 +304,21 @@ export function MobileTrioShowcase({
         </div>
       </div>
 
-      {/* --- 3 Smartphones on Dark Podium (Desktop: 3 in a row / Mobile: compact horizontal swipe carousel) --- */}
+      {/* --- 3 Smartphones on Dark Podium (Desktop: 3 in a row / Mobile: compact horizontal swipe carousel with magnetic snap) --- */}
       <div className="p-3 sm:p-6 md:p-8 relative rounded-b-[15px]">
         <div
           ref={scrollContainerRef}
-          onTouchMove={() => {
-            if (focusedScreen !== null) setFocusedScreen(null);
-          }}
-          onScroll={() => {
-            if (!isProgrammaticScrollRef.current && focusedScreen !== null) {
-              setFocusedScreen(null);
-            }
-          }}
-          className="relative z-10 flex sm:grid sm:grid-cols-3 sm:gap-5 md:gap-6 items-center overflow-x-auto sm:overflow-visible snap-x snap-mandatory gap-3.5 px-3 sm:px-1 pt-2 sm:pt-4 pb-3 sm:pb-4 custom-scrollbar touch-pan-y"
+          onScroll={handleScroll}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className="relative z-10 flex sm:grid sm:grid-cols-3 sm:gap-5 md:gap-6 items-center overflow-x-auto sm:overflow-visible snap-x snap-mandatory gap-4 px-[calc(50%-97.5px)] sm:px-1 pt-2 sm:pt-4 pb-3 sm:pb-4 custom-scrollbar select-none"
         >
           {screens.map((screen, idx) => {
-            const isThisFocused = focusedScreen === idx;
+            const isHighlighted = isMobile
+              ? activeMobileIdx === idx
+              : hoveredScreen === idx;
+            const isAnyActive = isMobile ? true : hoveredScreen !== null;
 
             // Staggering: central phone (idx 1) slightly higher, side phones (idx 0 & 2) slightly lower
             const staggerClass =
@@ -266,24 +330,31 @@ export function MobileTrioShowcase({
               <div
                 key={screen.src}
                 data-screen-idx={idx}
-                className={`w-[175px] max-w-[175px] sm:w-full sm:max-w-none shrink-0 snap-center transition-all duration-300 ${staggerClass}`}
+                className={`w-[195px] max-w-[195px] sm:w-full sm:max-w-none shrink-0 snap-center transition-all duration-300 ${staggerClass}`}
               >
                 <div
-                  onClick={() => onOpenLightbox?.(idx)}
-                  onMouseEnter={() => handleHoverScreen(idx)}
-                  onMouseLeave={() => setFocusedScreen(null)}
+                  onClick={() => {
+                    if (isSwipingRef.current) return;
+                    onOpenLightbox?.(idx);
+                  }}
+                  onMouseEnter={() => {
+                    if (!isMobile) setHoveredScreen(idx);
+                  }}
+                  onMouseLeave={() => {
+                    if (!isMobile) setHoveredScreen(null);
+                  }}
                   className={`group/phone rounded-[24px] p-[6px] bg-[#141418] border transition-all duration-350 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-zoom-in relative ${
-                    isThisFocused
+                    isHighlighted
                       ? 'scale-[1.03] z-20 opacity-100 sm:-translate-y-2'
-                      : isAnyFocused
-                      ? 'opacity-60 scale-[0.98] z-0'
+                      : isAnyActive
+                      ? 'opacity-55 scale-[0.96] z-0'
                       : 'opacity-100 hover:scale-[1.02] hover:opacity-100'
                   }`}
                   style={{
-                    borderColor: isThisFocused
+                    borderColor: isHighlighted
                       ? `rgba(${accentRgb}, 0.6)`
                       : 'rgba(255, 255, 255, 0.1)',
-                    boxShadow: isThisFocused
+                    boxShadow: isHighlighted
                       ? `0 20px 40px rgba(0,0,0,0.9), 0 0 24px rgba(${accentRgb}, 0.22)`
                       : '0 16px 36px rgba(0,0,0,0.85)',
                   }}
