@@ -5,12 +5,37 @@
   --font-mono: 'JetBrains Mono', monospace;
 }
 
-html, body {
+html {
   background-color: #070708;
   color: #ededef;
   font-family: var(--font-sans), sans-serif;
+  max-width: 100%;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  background-color: inherit;
+  color: inherit;
   overflow-x: clip;
   max-width: 100%;
+  min-height: 100%;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1.2px);
+  background-size: 24px 24px;
+  mask-image: radial-gradient(ellipse 95% 85% at 50% 32%, #000 45%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 95% 85% at 50% 32%, #000 45%, transparent 100%);
+  pointer-events: none;
 }
 
 /* --- Frame Surfaces --- */

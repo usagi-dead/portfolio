@@ -9,28 +9,31 @@ interface ScrollRevealProps {
 export function ScrollReveal({ children, className = '', delay = 0 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [isTransitionDone, setIsTransitionDone] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
-    // Check if element is already intersecting on mount
+    // Check if element is already within viewport on mount
     const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight - 30) {
+    if (rect.top < window.innerHeight) {
       if (delay > 0) {
-        const timer = setTimeout(() => setIsVisible(true), delay);
-        return () => clearTimeout(timer);
+        timerRef.current = setTimeout(() => setIsVisible(true), delay);
+      } else {
+        setIsVisible(true);
       }
-      setIsVisible(true);
-      return;
+      return () => {
+        if (timerRef.current) clearTimeout(timerRef.current);
+      };
     }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           if (delay > 0) {
-            const timer = setTimeout(() => setIsVisible(true), delay);
-            return () => clearTimeout(timer);
+            timerRef.current = setTimeout(() => setIsVisible(true), delay);
           } else {
             setIsVisible(true);
           }
@@ -38,22 +41,44 @@ export function ScrollReveal({ children, className = '', delay = 0 }: ScrollReve
         }
       },
       {
-        threshold: 0.05,
-        rootMargin: '0px 0px -30px 0px',
+        threshold: 0.01,
+        rootMargin: '0px 0px 40px 0px',
       }
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, [delay]);
+
+  // Once revealed and animation finishes, remove transform and will-change to prevent mobile scroll clipping
+  useEffect(() => {
+    if (isVisible && !isTransitionDone) {
+      const fallbackTimer = setTimeout(() => {
+        setIsTransitionDone(true);
+      }, 750);
+      return () => clearTimeout(fallbackTimer);
+    }
+  }, [isVisible, isTransitionDone]);
+
+  const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
+    if (e.target === ref.current && isVisible) {
+      setIsTransitionDone(true);
+    }
+  };
 
   return (
     <div
       ref={ref}
-      className={`transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[opacity,transform] ${
-        isVisible
-          ? 'opacity-100 translate-y-0'
-          : 'opacity-0 translate-y-6'
+      onTransitionEnd={handleTransitionEnd}
+      className={`transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        isTransitionDone
+          ? 'opacity-100 transform-none will-change-auto'
+          : isVisible
+          ? 'opacity-100 translate-y-0 will-change-[opacity,transform]'
+          : 'opacity-0 translate-y-3 sm:translate-y-6 will-change-[opacity,transform]'
       } ${className}`}
     >
       {children}

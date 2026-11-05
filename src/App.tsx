@@ -160,7 +160,7 @@ export default function App() {
         />
 
         <main
-          className={`space-y-10 sm:space-y-16 transition-opacity duration-150 ease-out ${
+          className={`relative z-[1] space-y-10 sm:space-y-16 transition-opacity duration-150 ease-out ${
             isLangSwitching ? 'opacity-40' : 'opacity-100'
           }`}
         >
@@ -175,12 +175,12 @@ export default function App() {
             <CodeEditorHero lang={lang} onRebootTerminal={handleRebootTerminal} />
           </div>
 
-          {/* Projects Section: glides up with 160ms delay on initial reveal */}
+          {/* Projects Section: smoothly reveals on initial reveal */}
           <div
-            className={`transition-[opacity,transform] duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[opacity,transform] ${
+            className={`transition-opacity duration-700 ease-out ${
               isContentVisible
-                ? 'opacity-100 translate-y-0 delay-160'
-                : 'opacity-0 translate-y-8 pointer-events-none'
+                ? 'opacity-100 delay-160'
+                : 'opacity-0 pointer-events-none'
             }`}
           >
             <ProjectsSection lang={lang} onOpenLightbox={handleOpenLightbox} />

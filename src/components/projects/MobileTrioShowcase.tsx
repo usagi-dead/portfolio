@@ -251,7 +251,7 @@ export function MobileTrioShowcase({
               setFocusedScreen(null);
             }
           }}
-          className="relative z-10 flex sm:grid sm:grid-cols-3 sm:gap-5 md:gap-6 items-center overflow-x-auto sm:overflow-visible snap-x snap-mandatory gap-3.5 px-3 sm:px-1 pt-2 sm:pt-4 pb-3 sm:pb-4 custom-scrollbar"
+          className="relative z-10 flex sm:grid sm:grid-cols-3 sm:gap-5 md:gap-6 items-center overflow-x-auto sm:overflow-visible snap-x snap-mandatory gap-3.5 px-3 sm:px-1 pt-2 sm:pt-4 pb-3 sm:pb-4 custom-scrollbar touch-pan-y"
         >
           {screens.map((screen, idx) => {
             const isThisFocused = focusedScreen === idx;
