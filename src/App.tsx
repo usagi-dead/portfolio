@@ -164,12 +164,12 @@ export default function App() {
             isLangSwitching ? 'opacity-40' : 'opacity-100'
           }`}
         >
-          {/* Code Editor Hero: glides up from bottom with 80ms delay on initial reveal */}
+          {/* Code Editor Hero: glides up on initial entrance */}
           <div
-            className={`transition-[opacity,transform] duration-750 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[opacity,transform] ${
+            className={`transition-opacity duration-700 ease-out sm:transition-[opacity,transform] sm:duration-750 sm:ease-[cubic-bezier(0.16,1,0.3,1)] ${
               isContentVisible
-                ? 'opacity-100 translate-y-0 delay-80'
-                : 'opacity-0 translate-y-6 pointer-events-none'
+                ? 'opacity-100 sm:translate-y-0 delay-80'
+                : 'opacity-0 sm:translate-y-6 pointer-events-none'
             }`}
           >
             <CodeEditorHero lang={lang} onRebootTerminal={handleRebootTerminal} />

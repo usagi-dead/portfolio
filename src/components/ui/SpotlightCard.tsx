@@ -13,6 +13,8 @@ let isGlobalListenerAttached = false;
 
 function setupGlobalMouseListener() {
   if (typeof window === 'undefined' || isGlobalListenerAttached) return;
+  const mq = window.matchMedia('(hover: hover) and (pointer: fine)');
+  if (!mq.matches) return;
   window.addEventListener(
     'mousemove',
     (e) => {
@@ -77,6 +79,10 @@ export function SpotlightCard({
   }, []);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(hover: hover) and (pointer: fine)');
+    if (!mq.matches) return;
+
     setupGlobalMouseListener();
 
     const handleScrollOrResize = () => {
